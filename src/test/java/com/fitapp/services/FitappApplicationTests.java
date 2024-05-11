@@ -11,3 +11,21 @@ class FitappApplicationTests {
 	}
 
 }
+
+//localhost:8080/api/todos
+
+/*
+{
+    "customerName": "Tom Ks",
+    "dateOfBirth": 1715071075392,
+    "gender": "Male",
+    "custHeight": {
+        "height": 6.0,
+        "heightUnits": "feet"
+    },
+    "custWeight": {
+        "weight": 90,
+        "weightUnits": "kg"
+    }
+}
+*/
