@@ -19,6 +19,6 @@ public class OtpModel {
 	@Id
 	private String id;
 	private String mobileNo;
-	private int otp;
+	private String otp;
 	private LocalDateTime generatedOn;
 }

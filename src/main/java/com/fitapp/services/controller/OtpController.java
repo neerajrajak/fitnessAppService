@@ -1,6 +1,7 @@
 package com.fitapp.services.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,11 @@ public class OtpController {
 	public OtpResponse sendOtp(@PathVariable String mobileNumber) {
 		log.info("Inside send OTP controller");
 		return otpService.sendOtp(mobileNumber);
+	}
+	
+	@GetMapping("/validate/{mobileNo}/{otp}")
+	public Boolean validateOtp(@PathVariable String mobileNo,@PathVariable int otp) {
+		log.info("Inside validate Otp Controller");
+		return otpService.validateOtp(mobileNo, otp);
 	}
 }

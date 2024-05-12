@@ -10,4 +10,8 @@ import com.fitapp.services.models.OtpModel;
 @Repository
 public interface OtpRespository extends MongoRepository<OtpModel, String> {
 
+	OtpModel findFirstByOrderByGeneratedOnDesc();
+
+	OtpModel findFirstByMobileNoOrderByGeneratedOnDesc(String mobileNo);
+
 }

@@ -1,8 +1,10 @@
 package com.fitapp.services.processor;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Random;
 
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.fitapp.services.dto.OtpResponse;
@@ -31,10 +33,11 @@ public class OtpService {
 		if(user != null) {
 			// generate otp
 			int otp = getOtp();
+			String ecodedotp = encodeOtp(otp);
 			
 			// save otp to db
 			OtpModel otpModel = new OtpModel();
-			otpModel.setOtp(otp);
+			otpModel.setOtp(ecodedotp);
 			otpModel.setMobileNo(mobileNumber);
 			otpModel.setGeneratedOn(LocalDateTime.now());
 			
@@ -48,6 +51,16 @@ public class OtpService {
 		return OtpResponse.builder().mobileNo(mobileNumber).isExistingUser(false).generatedOn(null).otp(0).build();
 	}
 	
+	public Boolean validateOtp(String mobileNo,int otp) {
+		log.info("Inside validate Otp Service.");
+		OtpModel otpRecord = OtpRepo.findFirstByMobileNoOrderByGeneratedOnDesc(mobileNo);
+		if(otpRecord != null) {
+			System.out.println("Validat Otp: "+otpRecord.getOtp());
+			return (decodeOtp(otpRecord.getOtp()) == otp);
+		}
+		return false;
+	}
+	
 	private int getOtp() {
 	    // It will generate 4 digit random Number.
 	    // from 0 to 9999
@@ -56,5 +69,19 @@ public class OtpService {
 	    System.out.println("OTp: "+ number);
 	    // this will convert any number sequence into 6 character.
 	    return number;
+	}
+	
+	private String encodeOtp(int otp) {
+		Base64.Encoder encoder = Base64.getMimeEncoder();  
+        String otpMessage = String.valueOf(otp);  
+        String encodedOtp = encoder.encodeToString(otpMessage.getBytes());  
+        return encodedOtp;
+	}
+	
+	private int decodeOtp(String encodedOtp) {
+		Base64.Decoder decoder = Base64.getMimeDecoder();  
+        // Decoding MIME encoded message  
+        String decodedOtp = new String(decoder.decode(encodedOtp));  
+        return Integer.parseInt(decodedOtp);
 	}
 }
