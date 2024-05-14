@@ -5,8 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.fitapp.services.models.OtpModel;
 
-
-
 @Repository
 public interface OtpRespository extends MongoRepository<OtpModel, String> {
 

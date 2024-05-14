@@ -19,15 +19,15 @@ public class OtpController {
 
 	@Autowired
 	private OtpService otpService;
-	
+
 	@PostMapping("/send/{mobileNumber}")
 	public OtpResponse sendOtp(@PathVariable String mobileNumber) {
 		log.info("Inside send OTP controller");
 		return otpService.sendOtp(mobileNumber);
 	}
-	
+
 	@GetMapping("/validate/{mobileNo}/{otp}")
-	public Boolean validateOtp(@PathVariable String mobileNo,@PathVariable int otp) {
+	public Boolean validateOtp(@PathVariable String mobileNo, @PathVariable int otp) {
 		log.info("Inside validate Otp Controller");
 		return otpService.validateOtp(mobileNo, otp);
 	}

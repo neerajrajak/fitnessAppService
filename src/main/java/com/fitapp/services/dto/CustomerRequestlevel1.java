@@ -3,11 +3,8 @@ package com.fitapp.services.dto;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Data
 @AllArgsConstructor
@@ -22,8 +19,7 @@ public class CustomerRequestlevel1 {
 	public CustomerWeight custWeight = new CustomerWeight();
 
 	@Component
-	@Getter
-	@Setter
+	@Data
 	public class CustomerHeight {
 
 		double height;
@@ -31,8 +27,7 @@ public class CustomerRequestlevel1 {
 	}
 
 	@Component
-	@Getter
-	@Setter
+	@Data
 	public class CustomerWeight {
 		double weight;
 		String weightUnits;

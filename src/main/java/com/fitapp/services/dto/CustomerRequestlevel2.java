@@ -1,11 +1,11 @@
 package com.fitapp.services.dto;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,27 +13,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerRequestlevel2 {
-	//private String customerid;
+	private String customerid;
 	private String mobileNo;
 	private String fitnessLevel;
 	private List<String> fitnessGoal = new ArrayList<String>();
 	private double bodyMassIndex;
-	//public HousingSocietyDetails housingSocietyDetails = new HousingSocietyDetails();
+	private double totalDlyEnergyExpend;
+	private String housingSocietyId;
+	public HousingSocietyDetailsReq housingSocietyDetails = new HousingSocietyDetailsReq();
 
-	/*
 	@Component
-	@Getter
-	@Setter
-	public class HousingSocietyDetails {
+	@Data
+	public class HousingSocietyDetailsReq {
 		String societyName;
 		String addressline1;
 		String addressline2;
 		String pincode;
 		String city;
 		String state;
-		double weight;
-		String weightUnits;
 
 	}
-	*/
+
 }
