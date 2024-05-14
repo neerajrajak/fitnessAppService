@@ -42,7 +42,7 @@ public class CustomerService {
 	@Autowired
 	HousingSocietyNumRepository housingSocNumRepository;
 
-	public void createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) {
+	public CustomerRegistration createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) {
 
 		CustomerRegistration customer = new CustomerRegistration();
 		customer.setCustomerid(StringUtils.leftPad(String.valueOf(getUsernNumNext()), 4, "0"));
@@ -56,10 +56,11 @@ public class CustomerService {
 		customer.custWeight.setWeightUnits(customerRequest.custWeight.getWeightUnits());
 		customerRepository.save(customer);
 		log.info("Customer {} is saved: ", customer.getCustomerid());
+		return customer;
 
 	}
 
-	public void updateCustomerReqlvl2(CustomerRequestlevel2 customerRequest) {
+	public CustomerRegistration updateCustomerReqlvl2(CustomerRequestlevel2 customerRequest) {
 
 		String housingSocietyId = customerRequest.getHousingSocietyId();
 
@@ -88,7 +89,8 @@ public class CustomerService {
 		updateDefination.set("totalDlyEnergyExpend", customerRequest.getTotalDlyEnergyExpend());
 		updateDefination.set("housingSocietyId", housingSocietyId);
 
-		mongoTemplate.findAndModify(query, updateDefination, CustomerRegistration.class);
+		CustomerRegistration customer =  mongoTemplate.findAndModify(query, updateDefination, CustomerRegistration.class);
+		return customer;
 
 	}
 

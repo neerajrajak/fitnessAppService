@@ -10,38 +10,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.CustomerRequestlevel1;
 import com.fitapp.services.dto.CustomerRequestlevel2;
+import com.fitapp.services.models.CustomerRegistration;
 import com.fitapp.services.processor.CustomerService;
 
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("api/todos")
+@RequestMapping("api/user")
 @AllArgsConstructor
 public class CustomerRegisterController {
 
 	CustomerService customerService = new CustomerService();
 
-	@PostMapping("/create1")
-	public ResponseEntity<String> createRequestLevel1(@RequestBody CustomerRequestlevel1 newUser) {
+	@PostMapping("/createUser")
+	public ResponseEntity<CustomerRegistration> createRequestLevel1(@RequestBody CustomerRequestlevel1 newUser) {
 
 		try {
 
-			customerService.createCustomerReqlvl1(newUser);
-			return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
+			CustomerRegistration customer =  customerService.createCustomerReqlvl1(newUser);
+			return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.CREATED);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
-	@PostMapping("/create2")
-	public ResponseEntity<String> createRequestLevel2(@RequestBody CustomerRequestlevel2 newUser) {
+	@PostMapping("/addGoals")
+	public ResponseEntity<CustomerRegistration> createRequestLevel2(@RequestBody CustomerRequestlevel2 newUser) {
 
 		try {
 
-			customerService.updateCustomerReqlvl2(newUser);
-			return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
+			CustomerRegistration customer = customerService.updateCustomerReqlvl2(newUser);
+			return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.OK);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+			return ResponseEntity.internalServerError().build();
 		}
 	}
 
