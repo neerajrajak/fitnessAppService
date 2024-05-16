@@ -1,8 +1,11 @@
 
 package com.fitapp.services.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fitapp.services.dto.CustomerRequestlevel1;
 import com.fitapp.services.dto.CustomerRequestlevel2;
 import com.fitapp.services.models.CustomerRegistration;
+import com.fitapp.services.models.PincodeMaster;
+import com.fitapp.services.models.SocietyDbMaster;
 import com.fitapp.services.processor.CustomerService;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +32,7 @@ public class CustomerRegisterController {
 
 		try {
 
-			CustomerRegistration customer =  customerService.createCustomerReqlvl1(newUser);
+			CustomerRegistration customer = customerService.createCustomerReqlvl1(newUser);
 			return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return ResponseEntity.internalServerError().build();
@@ -44,6 +49,30 @@ public class CustomerRegisterController {
 		} catch (Exception e) {
 			return ResponseEntity.internalServerError().build();
 		}
+	}
+
+	@GetMapping("/societydbmaster")
+	public ResponseEntity<?> getSocietyDbMaster() {
+
+		try {
+			List<SocietyDbMaster> societyDbDetails = customerService.getSocietyDbMaster();
+			return new ResponseEntity<>(societyDbDetails, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+		}
+
+	}
+
+	@GetMapping("/pincodemaster")
+	public ResponseEntity<?> getPincodeMaster() {
+
+		try {
+			List<PincodeMaster> pincodemaster = customerService.getPincodeMaster();
+			return new ResponseEntity<>(pincodemaster, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
+		}
+
 	}
 
 }

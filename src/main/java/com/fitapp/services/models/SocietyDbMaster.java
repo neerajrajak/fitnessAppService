@@ -7,11 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(value = "housingsocietymaster")
+@Document(value = "societydbmaster")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class HousingSocietyDetails {
+public class SocietyDbMaster {
 
 	@Id
 	private String societyId;

@@ -1,5 +1,6 @@
 package com.fitapp.services.processor;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,13 +14,15 @@ import org.springframework.stereotype.Service;
 import com.fitapp.services.dto.CustomerRequestlevel1;
 import com.fitapp.services.dto.CustomerRequestlevel2;
 import com.fitapp.services.models.CustomerRegistration;
-import com.fitapp.services.models.HousingSocietyDetails;
-import com.fitapp.services.models.HousingSocietyNum;
-import com.fitapp.services.models.UserNum;
+import com.fitapp.services.models.PincodeMaster;
+import com.fitapp.services.models.SocietyDbMaster;
+import com.fitapp.services.models.SocietyDbNum;
+import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.repository.CustomerRepository;
-import com.fitapp.services.repository.HousingSocietyNumRepository;
-import com.fitapp.services.repository.HousingSocietyRepository;
-import com.fitapp.services.repository.UserNumRepository;
+import com.fitapp.services.repository.SocietyDbNumRepository;
+import com.fitapp.services.repository.SocietyDbMasterRepository;
+import com.fitapp.services.repository.PincodeMasterRepository;
+import com.fitapp.services.repository.CustomerNumRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,13 +37,16 @@ public class CustomerService {
 	CustomerRepository customerRepository;
 
 	@Autowired
-	HousingSocietyRepository housingSocietyRepository;
+	SocietyDbMasterRepository societyDbRepository;
 
 	@Autowired
-	UserNumRepository userNumRepository;
-	
+	PincodeMasterRepository pincodeMasterRepository;
+
 	@Autowired
-	HousingSocietyNumRepository housingSocNumRepository;
+	CustomerNumRepository customerNumRepository;
+
+	@Autowired
+	SocietyDbNumRepository societyDbNumRepository;
 
 	public CustomerRegistration createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) {
 
@@ -65,7 +71,7 @@ public class CustomerService {
 		String housingSocietyId = customerRequest.getHousingSocietyId();
 
 		if (null == housingSocietyId) {
-			com.fitapp.services.models.HousingSocietyDetails housingSocietyDtls = new HousingSocietyDetails();
+			com.fitapp.services.models.SocietyDbMaster housingSocietyDtls = new SocietyDbMaster();
 			housingSocietyId = StringUtils.leftPad(String.valueOf(getHousingSocNumNext()), 4, "0");
 			housingSocietyDtls.setSocietyId(housingSocietyId);
 			housingSocietyDtls.setSocietyName(customerRequest.housingSocietyDetails.getSocietyName());
@@ -74,7 +80,7 @@ public class CustomerService {
 			housingSocietyDtls.setPincode(customerRequest.housingSocietyDetails.getPincode());
 			housingSocietyDtls.setCity(customerRequest.housingSocietyDetails.getCity());
 			housingSocietyDtls.setState(customerRequest.housingSocietyDetails.getState());
-			housingSocietyRepository.save(housingSocietyDtls);
+			societyDbRepository.save(housingSocietyDtls);
 		}
 
 		Query query = new Query();
@@ -82,14 +88,15 @@ public class CustomerService {
 		query.addCriteria(Criteria.where("mobileNo").is(customerRequest.getMobileNo()));
 
 		Update updateDefination = new Update();
-		//updateDefination.set("mobileNo", customerRequest.getMobileNo());
+		// updateDefination.set("mobileNo", customerRequest.getMobileNo());
 		updateDefination.set("fitnessLevel", customerRequest.getFitnessLevel());
 		updateDefination.set("fitnessGoal", customerRequest.getFitnessGoal());
 		updateDefination.set("bodyMassIndex", customerRequest.getBodyMassIndex());
 		updateDefination.set("totalDlyEnergyExpend", customerRequest.getTotalDlyEnergyExpend());
 		updateDefination.set("housingSocietyId", housingSocietyId);
 
-		CustomerRegistration customer =  mongoTemplate.findAndModify(query, updateDefination, CustomerRegistration.class);
+		CustomerRegistration customer = mongoTemplate.findAndModify(query, updateDefination,
+				CustomerRegistration.class);
 		return customer;
 
 	}
@@ -106,27 +113,37 @@ public class CustomerService {
 	 */
 
 	public long getUsernNumNext() {
-		UserNum last = userNumRepository.findTopByOrderByIdDesc();
+		CustomerNum last = customerNumRepository.findTopByOrderByIdDesc();
 
 		if (Objects.isNull(last) || Objects.isNull(last.seq)) {
-			last = new UserNum(0);
+			last = new CustomerNum(0);
 		}
 
-		UserNum next = new UserNum(last.seq + 1);
-		userNumRepository.save(next);
+		CustomerNum next = new CustomerNum(last.seq + 1);
+		customerNumRepository.save(next);
 		return next.seq;
 	}
 
 	public long getHousingSocNumNext() {
-		HousingSocietyNum last = housingSocNumRepository.findTopByOrderByIdDesc();
+		SocietyDbNum last = societyDbNumRepository.findTopByOrderByIdDesc();
 
 		if (Objects.isNull(last) || Objects.isNull(last.seq)) {
-			last = new HousingSocietyNum(0);
+			last = new SocietyDbNum(0);
 		}
 
-		HousingSocietyNum next = new HousingSocietyNum(last.seq + 1);
-		housingSocNumRepository.save(next);
+		SocietyDbNum next = new SocietyDbNum(last.seq + 1);
+		societyDbNumRepository.save(next);
 		return next.seq;
+	}
+
+	public List<SocietyDbMaster> getSocietyDbMaster() {
+		return societyDbRepository.findAll();
+
+	}
+
+	public List<PincodeMaster> getPincodeMaster() {
+		return pincodeMasterRepository.findAll();
+
 	}
 
 }
