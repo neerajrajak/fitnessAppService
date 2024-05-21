@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,11 +19,9 @@ import com.fitapp.services.models.PincodeMaster;
 import com.fitapp.services.models.SocietyDbMaster;
 import com.fitapp.services.processor.CustomerService;
 
-import lombok.AllArgsConstructor;
-
 @RestController
 @RequestMapping("api/user")
-@AllArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomerRegisterController {
 
 	CustomerService customerService = new CustomerService();
