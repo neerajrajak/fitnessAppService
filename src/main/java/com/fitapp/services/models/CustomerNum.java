@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CustomerNum {
 
 	@Id
-	private ObjectId id;
+	private String id;
 
 	public long seq;
 

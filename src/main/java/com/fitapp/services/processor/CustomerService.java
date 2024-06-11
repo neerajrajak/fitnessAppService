@@ -24,31 +24,28 @@ import com.fitapp.services.repository.SocietyDbMasterRepository;
 import com.fitapp.services.repository.PincodeMasterRepository;
 import com.fitapp.services.repository.CustomerNumRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CustomerService {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+	private final MongoTemplate mongoTemplate;
 
-	@Autowired
-	CustomerRepository customerRepository;
+	private final CustomerRepository customerRepository;
 
-	@Autowired
-	SocietyDbMasterRepository societyDbRepository;
+	private final SocietyDbMasterRepository societyDbRepository;
 
-	@Autowired
-	PincodeMasterRepository pincodeMasterRepository;
+	private final PincodeMasterRepository pincodeMasterRepository;
 
-	@Autowired
-	CustomerNumRepository customerNumRepository;
+	private final CustomerNumRepository customerNumRepository;
 
 	@Autowired
 	SocietyDbNumRepository societyDbNumRepository;
 
-	public CustomerRegistration createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) {
+	public CustomerRegistration createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) throws Exception {
 
 		CustomerRegistration customer = new CustomerRegistration();
 		customer.setCustomerid(StringUtils.leftPad(String.valueOf(getUsernNumNext()), 4, "0"));

@@ -3,6 +3,7 @@ package com.fitapp.services.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,53 +25,38 @@ import com.fitapp.services.processor.CustomerService;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomerRegisterController {
 
-	CustomerService customerService = new CustomerService();
+	@Autowired
+	CustomerService customerService;
 
 	@PostMapping("/createUser")
-	public ResponseEntity<CustomerRegistration> createRequestLevel1(@RequestBody CustomerRequestlevel1 newUser) {
+	public ResponseEntity<CustomerRegistration> createRequestLevel1(@RequestBody CustomerRequestlevel1 newUser)
+			throws Exception {
 
-		try {
-
-			CustomerRegistration customer = customerService.createCustomerReqlvl1(newUser);
-			return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return ResponseEntity.internalServerError().build();
-		}
+		CustomerRegistration customer = customerService.createCustomerReqlvl1(newUser);
+		return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.CREATED);
 	}
 
 	@PostMapping("/addGoals")
 	public ResponseEntity<CustomerRegistration> createRequestLevel2(@RequestBody CustomerRequestlevel2 newUser) {
 
-		try {
+		CustomerRegistration customer = customerService.updateCustomerReqlvl2(newUser);
+		return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.OK);
 
-			CustomerRegistration customer = customerService.updateCustomerReqlvl2(newUser);
-			return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.OK);
-		} catch (Exception e) {
-			return ResponseEntity.internalServerError().build();
-		}
 	}
 
 	@GetMapping("/societydbmaster")
 	public ResponseEntity<?> getSocietyDbMaster() {
 
-		try {
-			List<SocietyDbMaster> societyDbDetails = customerService.getSocietyDbMaster();
-			return new ResponseEntity<>(societyDbDetails, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
-		}
+		List<SocietyDbMaster> societyDbDetails = customerService.getSocietyDbMaster();
+		return new ResponseEntity<>(societyDbDetails, HttpStatus.CREATED);
 
 	}
 
 	@GetMapping("/pincodemaster")
 	public ResponseEntity<?> getPincodeMaster() {
 
-		try {
-			List<PincodeMaster> pincodemaster = customerService.getPincodeMaster();
-			return new ResponseEntity<>(pincodemaster, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
-		}
+		List<PincodeMaster> pincodemaster = customerService.getPincodeMaster();
+		return new ResponseEntity<>(pincodemaster, HttpStatus.CREATED);
 
 	}
 
