@@ -6,7 +6,9 @@ import java.util.Random;
 
 import org.springframework.stereotype.Service;
 
+import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.OtpResponse;
+import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.CustomerRegistration;
 import com.fitapp.services.models.OtpModel;
 import com.fitapp.services.repository.CustomerRepository;
@@ -46,8 +48,10 @@ public class OtpService {
 			// return response
 			return OtpResponse.builder().isExistingUser(true).mobileNo(mobileNumber).otp(otp)
 					.generatedOn(otpModel.getGeneratedOn()).build();
+		} else {
+			throw new NumberNotFoundException(FitAppConstants.NUMBER_NOT_FOUND);
 		}
-		return OtpResponse.builder().mobileNo(mobileNumber).isExistingUser(false).generatedOn(null).otp(0).build();
+		
 	}
 
 	public Boolean validateOtp(String mobileNo, int otp) {

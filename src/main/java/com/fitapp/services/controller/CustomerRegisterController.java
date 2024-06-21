@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,12 @@ public class CustomerRegisterController {
 
 	@Autowired
 	CustomerService customerService;
+	
+	@GetMapping("/details/{mobileNo}")
+	public ResponseEntity<CustomerRegistration> fetchCustomerDetails(@PathVariable String mobileNo){
+		CustomerRegistration customer = customerService.getCustomerDetails(mobileNo);
+		return new ResponseEntity<CustomerRegistration>(customer, HttpStatus.OK);
+	}
 
 	@PostMapping("/createUser")
 	public ResponseEntity<CustomerRegistration> createRequestLevel1(@RequestBody CustomerRequestlevel1 newUser)
