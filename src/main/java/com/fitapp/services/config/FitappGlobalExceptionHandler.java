@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fitapp.services.exception.CustomerAlreadyExistException;
 import com.fitapp.services.exception.NumberNotFoundException;
 
 @ControllerAdvice
@@ -14,6 +15,12 @@ public class FitappGlobalExceptionHandler {
 	public ResponseEntity<Object> handleNumberNotFoundException(NumberNotFoundException e) {
 		return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(),
 				HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(CustomerAlreadyExistException.class)
+	public ResponseEntity<Object> handleCustomerAlreadyExistException(CustomerAlreadyExistException e) {
+		return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(),
+				HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(Exception.class)

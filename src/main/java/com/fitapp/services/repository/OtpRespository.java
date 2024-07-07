@@ -12,4 +12,6 @@ public interface OtpRespository extends MongoRepository<OtpModel, String> {
 
 	OtpModel findFirstByMobileNoOrderByGeneratedOnDesc(String mobileNo);
 
+	OtpModel findFirstByMobileNoAndOtpForOrderByGeneratedOnDesc(String mobileNo, String string);
+
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.CustomerRequestlevel1;
 import com.fitapp.services.dto.CustomerRequestlevel2;
+import com.fitapp.services.exception.CustomerAlreadyExistException;
 import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.CustomerRegistration;
 import com.fitapp.services.models.PincodeMaster;
@@ -57,21 +58,24 @@ public class CustomerService {
 	}
 
 	public CustomerRegistration createCustomerReqlvl1(CustomerRequestlevel1 customerRequest) throws Exception {
-
-		CustomerRegistration customer = new CustomerRegistration();
-		customer.setCustomerid(StringUtils.leftPad(String.valueOf(getUsernNumNext()), 4, "0"));
-		customer.setCustomerName(customerRequest.getCustomerName());
-		customer.setMobileNo(customerRequest.getMobileNo());
-		customer.setDateOfBirth(customerRequest.getDateOfBirth());
-		customer.setGender(customerRequest.getGender());
-		customer.custHeight.setHeight(customerRequest.custHeight.getHeight());
-		customer.custHeight.setHeightUnits(customerRequest.custHeight.getHeightUnits());
-		customer.custWeight.setWeight(customerRequest.custWeight.getWeight());
-		customer.custWeight.setWeightUnits(customerRequest.custWeight.getWeightUnits());
-		customerRepository.save(customer);
-		log.info("Customer {} is saved: ", customer.getCustomerid());
-		return customer;
-
+		CustomerRegistration existingCust = customerRepository.findByMobileNo(customerRequest.getMobileNo());
+		if(existingCust != null) {
+			throw new CustomerAlreadyExistException(FitAppConstants.CUSTOMER_ALREADY_EXIST + existingCust.getCustomerName());
+		} else {
+			CustomerRegistration customer = new CustomerRegistration();
+			customer.setCustomerid(StringUtils.leftPad(String.valueOf(getUsernNumNext()), 4, "0"));
+			customer.setCustomerName(customerRequest.getCustomerName());
+			customer.setMobileNo(customerRequest.getMobileNo());
+			customer.setDateOfBirth(customerRequest.getDateOfBirth());
+			customer.setGender(customerRequest.getGender());
+			customer.custHeight.setHeight(customerRequest.custHeight.getHeight());
+			customer.custHeight.setHeightUnits(customerRequest.custHeight.getHeightUnits());
+			customer.custWeight.setWeight(customerRequest.custWeight.getWeight());
+			customer.custWeight.setWeightUnits(customerRequest.custWeight.getWeightUnits());
+			customerRepository.save(customer);
+			log.info("Customer {} is saved: ", customer.getCustomerid());
+			return customer;	
+		}
 	}
 
 	public CustomerRegistration updateCustomerReqlvl2(CustomerRequestlevel2 customerRequest) {
