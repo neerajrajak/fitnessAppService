@@ -1,4 +1,4 @@
-package com.fitapp.services.processor;
+package com.fitapp.services.service;
 
 import java.util.List;
 import java.util.Objects;

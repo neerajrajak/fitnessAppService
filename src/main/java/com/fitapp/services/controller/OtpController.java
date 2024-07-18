@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.OtpResponse;
-import com.fitapp.services.processor.OtpService;
+import com.fitapp.services.service.OtpService;
 
 import lombok.extern.slf4j.Slf4j;
 

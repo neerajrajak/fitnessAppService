@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewTrainerRequest {
+	private String trainerId;
+	private String trainerName;
 	private String mobileNo;
 	private String gender;
 	private String speciality;

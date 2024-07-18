@@ -19,7 +19,7 @@ import com.fitapp.services.dto.CustomerRequestlevel2;
 import com.fitapp.services.models.CustomerRegistration;
 import com.fitapp.services.models.PincodeMaster;
 import com.fitapp.services.models.SocietyDbMaster;
-import com.fitapp.services.processor.CustomerService;
+import com.fitapp.services.service.CustomerService;
 
 @RestController
 @RequestMapping("api/user")

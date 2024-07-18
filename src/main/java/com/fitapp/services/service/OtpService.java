@@ -1,4 +1,4 @@
-package com.fitapp.services.processor;
+package com.fitapp.services.service;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
