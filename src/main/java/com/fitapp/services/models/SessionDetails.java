@@ -1,11 +1,14 @@
 package com.fitapp.services.models;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.fitapp.services.dto.ClassInfo;
+import com.fitapp.services.dto.ClientInfo;
+import com.fitapp.services.dto.WorkoutPlans;
+
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,22 +19,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class SessionDetails {
-	
+
 	@Id
 	private String id;
-	
-	@GeneratedValue(strategy = GenerationType.AUTO)
+
 	private String sessionId;
-	
-	private Instant startTime;
-	private Instant endTime;
+	private LocalDateTime startTime;
+	private LocalDateTime actualStartTime;
+	private LocalDateTime endTime;
+	private LocalDateTime actualEndTime;
 	private String location;
 	private double totalhours;
+	private double actualTotalhours;
 	private String trainingName;
 	private String Attendance;
 	private String toBeTrainedBy;
 	private String trainerId;
 	private String trainerBuddy;
 	private String trainerBuddyId;
+	private String status;
+	private ClassInfo classInfo;
+	private List<WorkoutPlans> workoutPlans;
+	private List<ClientInfo> clientInfo;
 
 }

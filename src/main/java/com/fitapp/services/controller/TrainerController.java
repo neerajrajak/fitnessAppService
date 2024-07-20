@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.NewTrainerRequest;
-import com.fitapp.services.dto.SessionRequest;
-import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.service.TrainerService;
 
@@ -33,10 +31,4 @@ public class TrainerController {
 		return new ResponseEntity<TrainerDetails>(customer, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/createSession")
-	public ResponseEntity<SessionDetails> createSession(@RequestBody SessionRequest sessionRequest)
-			throws Exception {
-		SessionDetails customer = trainerService.createNewSession(sessionRequest);
-		return new ResponseEntity<SessionDetails>(customer, HttpStatus.CREATED);
-	}
 }

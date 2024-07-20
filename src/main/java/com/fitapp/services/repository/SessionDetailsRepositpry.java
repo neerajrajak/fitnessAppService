@@ -9,5 +9,7 @@ import com.fitapp.services.models.SessionDetails;
 public interface SessionDetailsRepositpry extends MongoRepository<SessionDetails, String>{
 
 	SessionDetails findByTrainerId(String trainerId);
+
+	SessionDetails findBySessionId(String sessionId);
 	
 }

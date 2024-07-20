@@ -11,13 +11,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fitapp.services.dto.NewTrainerRequest;
-import com.fitapp.services.dto.SessionRequest;
-import com.fitapp.services.models.SessionDestailNum;
-import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDbNum;
 import com.fitapp.services.models.TrainerDetails;
-import com.fitapp.services.repository.SessionDestailNumRepository;
-import com.fitapp.services.repository.SessionDetailsRepositpry;
 import com.fitapp.services.repository.TrainerDbNumRepository;
 import com.fitapp.services.repository.TrainerDetailsRepository;
 
@@ -33,12 +28,8 @@ public class TrainerService {
 	private final MongoTemplate mongoTemplate;
 
 	private final TrainerDetailsRepository trainerDetailsRepository;
-	
-	private final SessionDetailsRepositpry sessionDetailsRepositpry;
 
 	private final TrainerDbNumRepository trainerDbNumRepository;
-	
-	private final SessionDestailNumRepository sessionDestailNumRepository;
 
 	private ObjectMapper objectMapper;
 
@@ -63,15 +54,6 @@ public class TrainerService {
 		}
 	}
 	
-	public SessionDetails createNewSession(SessionRequest sessionRequest) {
-		SessionDetails sessionDetails = objectMapper.convertValue(sessionRequest,SessionDetails.class);
-		sessionDetails.setSessionId(StringUtils.leftPad(String.valueOf(getNextSessionId()), 4, "0"));
-
-		sessionDetails = sessionDetailsRepositpry.save(sessionDetails);		
-		log.info("session {} is saved: ", sessionDetails.getSessionId());
-		return sessionDetails;
-	}
-
 	public long getNextTrainerId() {
 		TrainerDbNum last = trainerDbNumRepository.findTopByOrderByIdDesc();
 		TrainerDbNum next;
@@ -94,26 +76,4 @@ public class TrainerService {
 		return next.getSeq();
 	}
 	
-	public long getNextSessionId() {
-		SessionDestailNum last = sessionDestailNumRepository.findTopByOrderByIdDesc();
-		SessionDestailNum next;
-		long updatedSeq = 0;
-		if (last != null) {
-			updatedSeq = last.getSeq() + 1;
-			Query query = new Query();
-			query.addCriteria(Criteria.where("id").is(last.getId()));
-			Update updateDefination = new Update();
-			updateDefination.set("seq", updatedSeq);
-			mongoTemplate.findAndModify(query, updateDefination, SessionDestailNum.class);
-		} else {
-			last = new SessionDestailNum(0);
-			updatedSeq = last.getSeq() + 1;
-			next = new SessionDestailNum(updatedSeq);
-			sessionDestailNumRepository.save(next);
-		}
-
-		next = new SessionDestailNum(updatedSeq);
-		return next.getSeq();
-	}
-
 }

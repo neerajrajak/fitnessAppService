@@ -1,6 +1,7 @@
 package com.fitapp.services.dto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
@@ -11,20 +12,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SessionRequest {
-
+public class SessionRequest {	
 	@Id
 	private String id;
-
-	private Instant startTime;
-	private Instant endTime;
+	
+	private String sessionId;
+	private LocalDateTime startTime;
+	private LocalDateTime actualStartTime;
+	private LocalDateTime endTime;
+	private LocalDateTime actualEndTime;
 	private String location;
 	private double totalhours;
+	private double actualTotalhours;
 	private String trainingName;
 	private String Attendance;
 	private String toBeTrainedBy;
 	private String trainerId;
 	private String trainerBuddy;
 	private String trainerBuddyId;
-
+	private String status;
+	private ClassInfo classInfo;
+	private List<WorkoutPlans> workoutPlans;
+	private List<ClientInfo> clientInfo;
 }
