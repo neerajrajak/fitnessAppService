@@ -1,6 +1,7 @@
 package com.fitapp.services.service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -83,8 +84,8 @@ public class SessionService {
 
 	public List<SessionDetails> getTrainerSessionDetail(SessionDetailRequest request) {
 		Collections.sort(request.getDate());
-		LocalDateTime startDate = request.getDate().get(0);
-		LocalDateTime endDate = request.getDate().get(request.getDate().size()-1);
+		LocalDateTime startDate = LocalDateTime.of(request.getDate().get(0).toLocalDate(), LocalTime.MIDNIGHT);;
+		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size()-1).toLocalDate(),LocalTime.MAX);
 		List<SessionDetails> sessionDetails = sessionDetailsRepositpry.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(
 				request.getTrainerId(),startDate,endDate);	
 		return sessionDetails;
