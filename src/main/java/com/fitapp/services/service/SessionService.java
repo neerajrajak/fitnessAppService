@@ -1,7 +1,8 @@
 package com.fitapp.services.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,16 +11,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fitapp.services.dto.ClassInfo;
-import com.fitapp.services.dto.ClientInfo;
+import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
-import com.fitapp.services.dto.WorkoutPlans;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.repository.SessionDestailNumRepository;
@@ -53,7 +49,6 @@ public class SessionService {
 	public SessionDetails createNewSession(SessionRequest sessionRequest) {
 		SessionDetails sessionDetails = objectMapper.convertValue(sessionRequest, SessionDetails.class);
 		sessionDetails.setSessionId(StringUtils.leftPad(String.valueOf(getNextSessionId()), 4, "0"));
-		System.out.println();
 		sessionDetails = sessionDetailsRepositpry.save(sessionDetails);
 		log.info("session {} is saved: ", sessionDetails.getSessionId());
 		return sessionDetails;
@@ -83,6 +78,15 @@ public class SessionService {
 
 	public SessionDetails getSessionDetails(String sessionId) {
 		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(sessionId);
+		return sessionDetails;
+	}
+
+	public List<SessionDetails> getTrainerSessionDetail(SessionDetailRequest request) {
+		Collections.sort(request.getDate());
+		LocalDateTime startDate = request.getDate().get(0);
+		LocalDateTime endDate = request.getDate().get(request.getDate().size()-1);
+		List<SessionDetails> sessionDetails = sessionDetailsRepositpry.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(
+				request.getTrainerId(),startDate,endDate);	
 		return sessionDetails;
 	}
 }
