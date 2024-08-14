@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,8 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
+import com.fitapp.services.models.ClientRecord;
+import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
+import com.fitapp.services.repository.ClientRecordNumRepository;
+import com.fitapp.services.repository.ClientRecordRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
 import com.fitapp.services.repository.SessionDetailsRepositpry;
 
@@ -38,6 +43,10 @@ public class SessionService {
 	private final SessionDestailNumRepository sessionDestailNumRepository;
 
 	private ObjectMapper objectMapper;
+
+	private final ClientRecordNumRepository clientRecordNumRepository;
+	
+	private final ClientRecordRepository clientRecordRepository;
 
 	@PostConstruct
 	public void configObjectMapper() {
@@ -89,5 +98,34 @@ public class SessionService {
 		List<SessionDetails> sessionDetails = sessionDetailsRepositpry.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(
 				request.getTrainerId(),startDate,endDate);	
 		return sessionDetails;
+	}
+	
+	public ClientRecord getClientDetail(String clientId,String sessionId) {
+		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientId(sessionId,clientId);
+		if(clientRecord.isPresent()) {
+			return clientRecord.get();
+		}
+		return null;
+	}
+	
+	public long getNextClientRecordId() {
+		CustomerNum last = clientRecordNumRepository.findTopByOrderByIdDesc();
+		CustomerNum next;
+		long updatedSeq = 0;
+		if (last != null) {
+			updatedSeq = last.getSeq() + 1;
+			Query query = new Query();
+			query.addCriteria(Criteria.where("id").is(last.getId()));
+			Update updateDefination = new Update();
+			updateDefination.set("seq", updatedSeq);
+			mongoTemplate.findAndModify(query, updateDefination, CustomerNum.class);
+		} else {
+			last = new CustomerNum(0);
+			updatedSeq = last.getSeq() + 1;
+			next = new CustomerNum(updatedSeq);
+			clientRecordNumRepository.save(next);
+		}
+		next = new CustomerNum(updatedSeq);
+		return next.getSeq();
 	}
 }
