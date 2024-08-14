@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.models.ClientRecord;
@@ -50,8 +51,14 @@ public class SessionScheduleController {
 	
 	@GetMapping("/getClientDetail/{sessionId}/{clientId}")
 	public ResponseEntity<ClientRecord> getClientDetail(@PathVariable  String sessionId,@PathVariable  String clientId) throws Exception {
-		ClientRecord customer = sessionService.getClientDetail(clientId,sessionId);
-		return new ResponseEntity<ClientRecord>(customer, HttpStatus.OK);
+		ClientRecord clientRecord = sessionService.getClientDetail(clientId,sessionId);
+		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
+	}
+	
+	@PostMapping("/addClientDetails/{clientId}")
+	public ResponseEntity<ClientRecord> addClientDetails(@RequestBody ClientRecordDto clientRecordDto) throws Exception {
+		ClientRecord clientRecord = sessionService.addClientDetails(clientRecordDto);
+		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
 	}
 	
 }

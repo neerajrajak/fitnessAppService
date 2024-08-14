@@ -10,6 +10,6 @@ import com.fitapp.services.models.ClientRecord;
 @Repository
 public interface ClientRecordRepository extends MongoRepository<ClientRecord, String>{
 
-	Optional<ClientRecord> findBySessionIdAndClientId(String sessionId, String clientId);
+	Optional<ClientRecord> findBySessionIdAndClientRecordId(String sessionId, String clientId);
 
 }

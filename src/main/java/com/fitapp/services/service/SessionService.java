@@ -13,15 +13,18 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
+import com.fitapp.services.models.TrainerNotes;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
@@ -101,11 +104,21 @@ public class SessionService {
 	}
 	
 	public ClientRecord getClientDetail(String clientId,String sessionId) {
-		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientId(sessionId,clientId);
+		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientRecordId(sessionId,clientId);
 		if(clientRecord.isPresent()) {
 			return clientRecord.get();
 		}
 		return null;
+	}
+	
+	public ClientRecord addClientDetails( ClientRecordDto clientRecordDto) {
+		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
+			
+	    clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
+		
+		clientRecord = clientRecordRepository.save(clientRecord);
+		log.info("session {} is saved: ", clientRecord.getSessionId());
+		return clientRecord;
 	}
 	
 	public long getNextClientRecordId() {
