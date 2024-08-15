@@ -23,6 +23,7 @@ public class ClientRecord {
 	private String trainerId;
 	private String sessionId;
 	private String trainerName;
+	private String clientId;
 	private LocalDate memberSince;
 	private String clientName;
 	private String clientAge;

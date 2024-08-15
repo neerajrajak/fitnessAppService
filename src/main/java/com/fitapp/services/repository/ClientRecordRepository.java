@@ -12,4 +12,6 @@ public interface ClientRecordRepository extends MongoRepository<ClientRecord, St
 
 	Optional<ClientRecord> findBySessionIdAndClientRecordId(String sessionId, String clientId);
 
+	Optional<ClientRecord> findBySessionIdAndClientId(String sessionId, String clientId);
+
 }

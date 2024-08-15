@@ -22,6 +22,7 @@ public class ClientRecordDto {
 	private LocalDate memberSince;
 	private String clientName;
 	private String clientAge;
+	private String clientId;
 	private String fitnessLevel;
 	private String attendance;
 	private String totalSession;

@@ -104,7 +104,7 @@ public class SessionService {
 	}
 	
 	public ClientRecord getClientDetail(String clientId,String sessionId) {
-		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientRecordId(sessionId,clientId);
+		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientId(sessionId,clientId);
 		if(clientRecord.isPresent()) {
 			return clientRecord.get();
 		}
