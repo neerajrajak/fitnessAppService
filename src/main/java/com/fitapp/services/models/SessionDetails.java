@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fitapp.services.dto.ClassInfo;
+import com.fitapp.services.dto.ClientAttendanceInfo;
 import com.fitapp.services.dto.ClientInfo;
 import com.fitapp.services.dto.WorkoutPlans;
 
@@ -32,7 +33,7 @@ public class SessionDetails {
 	private double totalhours;
 	private double actualTotalhours;
 	private String trainingName;
-	private String Attendance;
+	private List<ClientAttendanceInfo> clientAttendance; 
 	private String toBeTrainedBy;
 	private String trainerId;
 	private String trainerBuddy;

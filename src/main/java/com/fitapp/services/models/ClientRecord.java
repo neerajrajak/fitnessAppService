@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fitapp.services.dto.AttendedSession;
+
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +27,7 @@ public class ClientRecord {
 	private String trainerName;
 	private String clientId;
 	private LocalDate memberSince;
+	private List<AttendedSession> sessionAttended;
 	private String clientName;
 	private String clientAge;
 	private String fitnessLevel;

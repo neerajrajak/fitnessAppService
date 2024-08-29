@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.ClientRecordDto;
+import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.models.ClientRecord;
@@ -59,6 +60,12 @@ public class SessionScheduleController {
 	public ResponseEntity<ClientRecord> addClientDetails(@RequestBody ClientRecordDto clientRecordDto) throws Exception {
 		ClientRecord clientRecord = sessionService.addClientDetails(clientRecordDto);
 		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
+	}
+	
+	@PostMapping("/markAttendance")
+	public ResponseEntity<Boolean> markAttendance(@RequestBody MarkAttendance attendance) throws Exception {
+		boolean success = sessionService.MarkAttendance(attendance);
+		return new ResponseEntity<Boolean>(success, HttpStatus.OK);
 	}
 	
 }

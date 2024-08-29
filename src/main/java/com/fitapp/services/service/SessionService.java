@@ -2,9 +2,13 @@ package com.fitapp.services.service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,19 +16,21 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fitapp.services.dto.AttendedSession;
+import com.fitapp.services.dto.ClientAttendanceInfo;
 import com.fitapp.services.dto.ClientRecordDto;
+import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
-import com.fitapp.services.models.TrainerNotes;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
@@ -48,7 +54,7 @@ public class SessionService {
 	private ObjectMapper objectMapper;
 
 	private final ClientRecordNumRepository clientRecordNumRepository;
-	
+
 	private final ClientRecordRepository clientRecordRepository;
 
 	@PostConstruct
@@ -96,31 +102,33 @@ public class SessionService {
 
 	public List<SessionDetails> getTrainerSessionDetail(SessionDetailRequest request) {
 		Collections.sort(request.getDate());
-		LocalDateTime startDate = LocalDateTime.of(request.getDate().get(0).toLocalDate(), LocalTime.MIDNIGHT);;
-		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size()-1).toLocalDate(),LocalTime.MAX);
-		List<SessionDetails> sessionDetails = sessionDetailsRepositpry.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(
-				request.getTrainerId(),startDate,endDate);	
+		LocalDateTime startDate = LocalDateTime.of(request.getDate().get(0).toLocalDate(), LocalTime.MIDNIGHT);
+		;
+		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size() - 1).toLocalDate(),
+				LocalTime.MAX);
+		List<SessionDetails> sessionDetails = sessionDetailsRepositpry
+				.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(request.getTrainerId(), startDate, endDate);
 		return sessionDetails;
 	}
-	
-	public ClientRecord getClientDetail(String clientId,String sessionId) {
-		Optional<ClientRecord> clientRecord= clientRecordRepository.findBySessionIdAndClientId(sessionId,clientId);
-		if(clientRecord.isPresent()) {
+
+	public ClientRecord getClientDetail(String clientId, String sessionId) {
+		Optional<ClientRecord> clientRecord = clientRecordRepository.findBySessionIdAndClientId(sessionId, clientId);
+		if (clientRecord.isPresent()) {
 			return clientRecord.get();
 		}
 		return null;
 	}
-	
-	public ClientRecord addClientDetails( ClientRecordDto clientRecordDto) {
+
+	public ClientRecord addClientDetails(ClientRecordDto clientRecordDto) {
 		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
-			
-	    clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
-		
+
+		clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
+
 		clientRecord = clientRecordRepository.save(clientRecord);
 		log.info("session {} is saved: ", clientRecord.getSessionId());
 		return clientRecord;
 	}
-	
+
 	public long getNextClientRecordId() {
 		CustomerNum last = clientRecordNumRepository.findTopByOrderByIdDesc();
 		CustomerNum next;
@@ -140,5 +148,39 @@ public class SessionService {
 		}
 		next = new CustomerNum(updatedSeq);
 		return next.getSeq();
+	}
+
+	@Transactional
+	public boolean MarkAttendance(MarkAttendance attendance) {
+		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(attendance.getSessionId());
+		List<String> clientIds = attendance.getClientAttendance().stream().map(ClientAttendanceInfo::getClientId)
+				.collect(Collectors.toList());
+		if (sessionDetails.getClientAttendance() == null) {
+			sessionDetails.setClientAttendance(attendance.getClientAttendance());
+		} else {
+			sessionDetails.getClientAttendance().addAll(attendance.getClientAttendance());
+		}
+		List<ClientRecord> clientRecordList = clientRecordRepository
+				.findBySessionIdAndClientIdIn(attendance.getSessionId(), clientIds);
+		Map<String, ClientAttendanceInfo> ClientAttendanceInfoMap = attendance.getClientAttendance().stream()
+				.collect(Collectors.toMap(ClientAttendanceInfo::getClientId, Function.identity()));
+
+		for (ClientRecord clientRecord : clientRecordList) {
+			AttendedSession attendedSession = new AttendedSession();
+			ClientAttendanceInfo clientAttendanceInfo = ClientAttendanceInfoMap.get(clientRecord.getClientId());
+			attendedSession.setSessionId(clientRecord.getSessionId());
+			attendedSession.setClientLocation(clientAttendanceInfo.getClientImg());
+			attendedSession.setClientImg(clientAttendanceInfo.getClientLocation());
+			if (clientRecord.getSessionAttended() == null) {
+				List<AttendedSession> attendedSessionList = new ArrayList<>();
+				attendedSessionList.add(attendedSession);
+				clientRecord.setSessionAttended(attendedSessionList);
+			} else {
+				clientRecord.getSessionAttended().add(attendedSession);
+			}
+		}
+		clientRecordRepository.saveAll(clientRecordList);
+		sessionDetailsRepositpry.save(sessionDetails);
+		return true;
 	}
 }
