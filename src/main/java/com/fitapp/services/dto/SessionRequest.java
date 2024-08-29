@@ -25,7 +25,7 @@ public class SessionRequest {
 	private double totalhours;
 	private double actualTotalhours;
 	private String trainingName;
-	private String Attendance;
+	private List<ClientAttendanceInfo> clientAttendance; 
 	private String toBeTrainedBy;
 	private String trainerId;
 	private String trainerBuddy;

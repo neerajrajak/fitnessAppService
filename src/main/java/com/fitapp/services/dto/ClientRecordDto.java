@@ -20,6 +20,7 @@ public class ClientRecordDto {
 	private String sessionId;
 	private String trainerName;
 	private LocalDate memberSince;
+	private List<AttendedSession> sessionAttended;
 	private String clientName;
 	private String clientAge;
 	private String clientId;
