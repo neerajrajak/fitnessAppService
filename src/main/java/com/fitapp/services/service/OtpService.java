@@ -111,7 +111,7 @@ public class OtpService {
 		// It will generate 4 digit random Number.
 		// from 0 to 9999
 		Random rnd = new Random();
-		int number = rnd.nextInt(9999);
+		int number =1000 + rnd.nextInt(9000);
 		System.out.println("OTp: " + number);
 		// this will convert any number sequence into 6 character.
 		return number;
