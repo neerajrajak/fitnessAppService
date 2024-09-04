@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.NewTrainerRequest;
+import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.TrainerDbNum;
 import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.repository.TrainerDbNumRepository;
@@ -51,6 +53,15 @@ public class TrainerService {
 			trainerDetailsRepository.save(trainerDetails);		
 			log.info("Trainer {} is saved: ", trainerDetails.getTrainerId());
 			return trainerDetails;
+		}
+	}
+	
+	public  TrainerDetails getTrainerDetails(String mobileNo) {
+		TrainerDetails trainer = trainerDetailsRepository.findByMobileNo(mobileNo);
+		if(trainer != null) {
+			return trainer;
+		} else {
+			throw new NumberNotFoundException(FitAppConstants.TRAINER_NOT_FOUND);
 		}
 	}
 	
