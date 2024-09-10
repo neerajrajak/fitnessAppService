@@ -1,5 +1,6 @@
 package com.fitapp.services.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,16 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.AttendedSession;
 import com.fitapp.services.dto.ClientAttendanceInfo;
 import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
+import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
+import com.fitapp.services.models.TrainerDashboardDetail;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
@@ -100,15 +104,29 @@ public class SessionService {
 		return sessionDetails;
 	}
 
-	public List<SessionDetails> getTrainerSessionDetail(SessionDetailRequest request) {
+	public TrainerDashboardDetail getTrainerSessionDetail(SessionDetailRequest request) {
 		Collections.sort(request.getDate());
 		LocalDateTime startDate = LocalDateTime.of(request.getDate().get(0).toLocalDate(), LocalTime.MIDNIGHT);
-		;
+		TrainerDashboardDetail trainerDashboardDetail = new TrainerDashboardDetail();
 		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size() - 1).toLocalDate(),
 				LocalTime.MAX);
 		List<SessionDetails> sessionDetails = sessionDetailsRepositpry
 				.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(request.getTrainerId(), startDate, endDate);
-		return sessionDetails;
+		trainerDashboardDetail.setSessionDetail(sessionDetails);
+		int customerTrained=0;
+		int trainingTime=0;
+		int totalTimelyAttendance=0;
+		List<SessionDetails> allSessionDetails = sessionDetailsRepositpry.findAllByTrainerId(request.getTrainerId());
+		for(SessionDetails session: allSessionDetails) {
+			trainingTime +=session.getTotalhours();
+			customerTrained += session.getClientInfo().size();
+			
+		}
+		
+		trainerDashboardDetail.setTrainingTime(trainingTime);
+		trainerDashboardDetail.setCustomerTrained(customerTrained);
+		trainerDashboardDetail.setTotalTimelyAttendance(totalTimelyAttendance);
+		return trainerDashboardDetail;
 	}
 
 	public ClientRecord getClientDetail(String clientId, String sessionId) {
@@ -182,5 +200,27 @@ public class SessionService {
 		clientRecordRepository.saveAll(clientRecordList);
 		sessionDetailsRepositpry.save(sessionDetails);
 		return true;
+	}
+
+	public SessionDetails startAndEndSession(String sessionId, String state) {
+		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(sessionId);
+		if (sessionDetails == null) {
+			throw new NumberNotFoundException(FitAppConstants.SESSION_NOT_FOUND);
+		}
+		if ("start".equals(state)) {
+			sessionDetails.setActualStartTime(LocalDateTime.now());
+			if (LocalDateTime.now().isAfter(sessionDetails.getStartTime())) {
+				sessionDetails.setStatus("RunningLate");
+			} else {
+				sessionDetails.setStatus("Active");
+			}
+		} else if ("end".equals(state)) {
+			sessionDetails.setActualEndTime(LocalDateTime.now());
+			sessionDetails.setActualTotalhours(
+					Duration.between(sessionDetails.getActualStartTime(), sessionDetails.getActualEndTime()).toHours());
+			sessionDetails.setStatus("Close");
+		}
+		sessionDetails = sessionDetailsRepositpry.save(sessionDetails);
+		return sessionDetails;
 	}
 }

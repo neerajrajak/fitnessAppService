@@ -17,5 +17,7 @@ public interface SessionDetailsRepositpry extends MongoRepository<SessionDetails
 
 	List<SessionDetails> findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(String trainerId, LocalDateTime startDate,
 			LocalDateTime endDate);
+
+	List<SessionDetails> findAllByTrainerId(String trainerId);
 	
 }

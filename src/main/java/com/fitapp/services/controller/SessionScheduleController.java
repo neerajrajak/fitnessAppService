@@ -1,7 +1,5 @@
 package com.fitapp.services.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +17,8 @@ import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.SessionDetails;
+import com.fitapp.services.models.TrainerDashboardDetail;
+import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.service.SessionService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +45,9 @@ public class SessionScheduleController {
 	}
 	
 	@PostMapping("/getTrainerSessionDetail")
-	public ResponseEntity<List<SessionDetails>> getTrainerSessionDetail(@RequestBody  SessionDetailRequest request) throws Exception {
-		List<SessionDetails> customer = sessionService.getTrainerSessionDetail(request);
-		return new ResponseEntity<List<SessionDetails>>(customer, HttpStatus.OK);
+	public ResponseEntity<TrainerDashboardDetail> getTrainerSessionDetail(@RequestBody  SessionDetailRequest request) throws Exception {
+		TrainerDashboardDetail trainerDashboardDetail = sessionService.getTrainerSessionDetail(request);
+		return new ResponseEntity<TrainerDashboardDetail>(trainerDashboardDetail, HttpStatus.OK);
 	}
 	
 	@GetMapping("/getClientDetail/{sessionId}/{clientId}")
@@ -66,6 +66,12 @@ public class SessionScheduleController {
 	public ResponseEntity<Boolean> markAttendance(@RequestBody MarkAttendance attendance) throws Exception {
 		boolean success = sessionService.MarkAttendance(attendance);
 		return new ResponseEntity<Boolean>(success, HttpStatus.OK);
+	}
+	
+	@GetMapping("/startEndSession/{sessionId}/{state}")
+	public ResponseEntity<SessionDetails> startAndEndSession(@PathVariable String sessionId,@PathVariable String state){
+		SessionDetails sessionDetails = sessionService.startAndEndSession(sessionId,state);
+		return new ResponseEntity<SessionDetails>(sessionDetails, HttpStatus.OK);
 	}
 	
 }
