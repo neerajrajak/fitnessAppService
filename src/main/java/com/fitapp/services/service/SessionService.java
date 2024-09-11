@@ -145,6 +145,10 @@ public class SessionService {
 
 	public ClientRecord addAndUpdateClientDetails(ClientRecordDto clientRecordDto) {
 		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
+		ClientRecord clientDetail = clientRecordRepository.findByClientId(clientRecordDto.getClientId());
+		if(clientDetail!=null) {
+			throw new NumberNotFoundException(FitAppConstants.CLIENT_ALREADY_PRESENT);
+		}
 		if(clientRecord.getClientRecordId() == null) {		
 			clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
 		}

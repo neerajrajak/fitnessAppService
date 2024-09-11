@@ -64,7 +64,7 @@ public class SessionScheduleController {
 	}
 	
 	@PostMapping("/addTrainerNotes")
-	public ResponseEntity<ClientRecord> addTrainerNotes(@PathVariable TainerNotesDto tainerNotesDto) throws Exception {
+	public ResponseEntity<ClientRecord> addTrainerNotes(@RequestBody TainerNotesDto tainerNotesDto) throws Exception {
 		ClientRecord clientRecord = sessionService.addTrainerNotes(tainerNotesDto);
 		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
 	}
