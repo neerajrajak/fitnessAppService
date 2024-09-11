@@ -10,4 +10,6 @@ public interface TrainerDetailsRepository extends MongoRepository<TrainerDetails
 
 	TrainerDetails findByMobileNo(String mobileNo);
 
+	TrainerDetails findByTrainerId(String trainerId);
+
 }

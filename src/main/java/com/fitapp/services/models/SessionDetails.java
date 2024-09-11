@@ -30,6 +30,7 @@ public class SessionDetails {
 	private LocalDateTime endTime;
 	private LocalDateTime actualEndTime;
 	private String location;
+	private String runningLateTime;
 	private double totalhours;
 	private double actualTotalhours;
 	private String trainingName;

@@ -9,16 +9,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
+import com.fitapp.services.dto.TainerNotesDto;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
-import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.service.SessionService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,13 @@ public class SessionScheduleController {
 	
 	@PostMapping("/addClientDetails/{clientId}")
 	public ResponseEntity<ClientRecord> addClientDetails(@RequestBody ClientRecordDto clientRecordDto) throws Exception {
-		ClientRecord clientRecord = sessionService.addClientDetails(clientRecordDto);
+		ClientRecord clientRecord = sessionService.addAndUpdateClientDetails(clientRecordDto);
+		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
+	}
+	
+	@PostMapping("/addTrainerNotes")
+	public ResponseEntity<ClientRecord> addTrainerNotes(@PathVariable TainerNotesDto tainerNotesDto) throws Exception {
+		ClientRecord clientRecord = sessionService.addTrainerNotes(tainerNotesDto);
 		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
 	}
 	
@@ -74,4 +81,9 @@ public class SessionScheduleController {
 		return new ResponseEntity<SessionDetails>(sessionDetails, HttpStatus.OK);
 	}
 	
+	@GetMapping("/markRunningLate/{sessionId}")
+	public ResponseEntity<SessionDetails> markRunningLate(@PathVariable String sessionId,@RequestParam String timing){
+		SessionDetails sessionDetails = sessionService.markRunningLate(sessionId,timing);
+		return new ResponseEntity<SessionDetails>(sessionDetails, HttpStatus.OK);
+	}
 }

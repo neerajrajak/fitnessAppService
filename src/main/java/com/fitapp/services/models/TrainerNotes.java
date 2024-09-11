@@ -15,6 +15,7 @@ public class TrainerNotes {
 	private String trainerName;
 	private LocalDateTime date;
 	private String workOutName;
+	private String trainerSpeciality;
 	private String remark;
 
 }

@@ -29,16 +29,20 @@ import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
+import com.fitapp.services.dto.TainerNotesDto;
 import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
+import com.fitapp.services.models.TrainerDetails;
+import com.fitapp.services.models.TrainerNotes;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
 import com.fitapp.services.repository.SessionDetailsRepositpry;
+import com.fitapp.services.repository.TrainerDetailsRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +58,8 @@ public class SessionService {
 	private final SessionDetailsRepositpry sessionDetailsRepositpry;
 
 	private final SessionDestailNumRepository sessionDestailNumRepository;
+	
+	private final TrainerDetailsRepository trainerDetailsRepository;
 
 	private ObjectMapper objectMapper;
 
@@ -137,11 +143,11 @@ public class SessionService {
 		return null;
 	}
 
-	public ClientRecord addClientDetails(ClientRecordDto clientRecordDto) {
+	public ClientRecord addAndUpdateClientDetails(ClientRecordDto clientRecordDto) {
 		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
-
-		clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
-
+		if(clientRecord.getClientRecordId() == null) {		
+			clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
+		}
 		clientRecord = clientRecordRepository.save(clientRecord);
 		log.info("session {} is saved: ", clientRecord.getSessionId());
 		return clientRecord;
@@ -222,5 +228,34 @@ public class SessionService {
 		}
 		sessionDetails = sessionDetailsRepositpry.save(sessionDetails);
 		return sessionDetails;
+	}
+
+	public SessionDetails markRunningLate(String sessionId, String timing) {
+		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(sessionId);
+		if (sessionDetails == null) {
+			throw new NumberNotFoundException(FitAppConstants.SESSION_NOT_FOUND);
+		}
+		sessionDetails.setStatus("RunningLate");
+		sessionDetails.setRunningLateTime(timing);
+		sessionDetails = sessionDetailsRepositpry.save(sessionDetails);
+		return sessionDetails;
+	}
+
+	public ClientRecord addTrainerNotes(TainerNotesDto tainerNotesDto) {
+		ClientRecord clientRecord = clientRecordRepository.findByClientId(tainerNotesDto.getClientId());
+		TrainerDetails trainerDetail = trainerDetailsRepository
+				.findByTrainerId(tainerNotesDto.getTrainerNotes().getTrainerId());
+		if (clientRecord.getTrainerNotes() == null) {
+			ArrayList<TrainerNotes> list = new ArrayList<>();
+			list.add(tainerNotesDto.getTrainerNotes());
+			clientRecord.setTrainerNotes(list);
+		} else {
+			if (trainerDetail != null) {
+				tainerNotesDto.getTrainerNotes().setTrainerSpeciality(trainerDetail.getSpeciality());
+			}
+			clientRecord.getTrainerNotes().add(tainerNotesDto.getTrainerNotes());
+		}
+		clientRecord = clientRecordRepository.save(clientRecord);
+		return clientRecord;
 	}
 }
