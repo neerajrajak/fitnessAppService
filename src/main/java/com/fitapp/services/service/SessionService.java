@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -67,6 +68,8 @@ public class SessionService {
 	private final TrainerDetailsRepository trainerDetailsRepository;
 
 	private ObjectMapper objectMapper;
+	
+	private ModelMapper modelMapper;
 
 	private final ClientRecordNumRepository clientRecordNumRepository;
 
@@ -82,6 +85,7 @@ public class SessionService {
 		JavaTimeModule module = new JavaTimeModule();
 		objectMapper.registerModule(module);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		this.modelMapper = new ModelMapper();
 	}
 
 	public SessionDetails createNewSession(SessionRequest sessionRequest) {
@@ -156,7 +160,8 @@ public class SessionService {
 		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
 		ClientRecord clientDetail = clientRecordRepository.findByClientId(clientRecordDto.getClientId());
 		if (clientDetail != null) {
-			throw new NumberNotFoundException(FitAppConstants.CLIENT_ALREADY_PRESENT);
+			clientDetail = modelMapper.map(clientRecordDto, ClientRecord.class);
+			return clientRecordRepository.save(clientDetail);
 		}
 		if (clientRecord.getClientRecordId() == null) {
 			clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));

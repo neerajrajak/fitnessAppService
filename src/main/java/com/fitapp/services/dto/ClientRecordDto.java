@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ClientRecordDto {
-
+	private String id;
 	private String clientRecordId;
 	private String trainerId;
 	private String sessionId;
