@@ -1,5 +1,7 @@
 package com.fitapp.services.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fitapp.services.dto.ClientRecordDto;
+import com.fitapp.services.dto.EquipmentChecklistDto;
 import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.dto.TainerNotesDto;
 import com.fitapp.services.models.ClientRecord;
+import com.fitapp.services.models.Equipment;
+import com.fitapp.services.models.EquipmentChecklist;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
 import com.fitapp.services.service.SessionService;
@@ -51,13 +56,13 @@ public class SessionScheduleController {
 		return new ResponseEntity<TrainerDashboardDetail>(trainerDashboardDetail, HttpStatus.OK);
 	}
 	
-	@GetMapping("/getClientDetail/{sessionId}/{clientId}")
-	public ResponseEntity<ClientRecord> getClientDetail(@PathVariable  String sessionId,@PathVariable  String clientId) throws Exception {
-		ClientRecord clientRecord = sessionService.getClientDetail(clientId,sessionId);
+	@GetMapping("/getClientDetail/{clientId}")
+	public ResponseEntity<ClientRecord> getClientDetail(@PathVariable  String clientId) throws Exception {
+		ClientRecord clientRecord = sessionService.getClientDetail(clientId);
 		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
 	}
 	
-	@PostMapping("/addClientDetails/{clientId}")
+	@PostMapping("/addClientDetails")
 	public ResponseEntity<ClientRecord> addClientDetails(@RequestBody ClientRecordDto clientRecordDto) throws Exception {
 		ClientRecord clientRecord = sessionService.addAndUpdateClientDetails(clientRecordDto);
 		return new ResponseEntity<ClientRecord>(clientRecord, HttpStatus.OK);
@@ -85,5 +90,23 @@ public class SessionScheduleController {
 	public ResponseEntity<SessionDetails> markRunningLate(@PathVariable String sessionId,@RequestParam String timing){
 		SessionDetails sessionDetails = sessionService.markRunningLate(sessionId,timing);
 		return new ResponseEntity<SessionDetails>(sessionDetails, HttpStatus.OK);
+	}
+	
+	@PostMapping("/updateCheckList")
+	public ResponseEntity<EquipmentChecklist> updateCheckList(@RequestBody EquipmentChecklistDto equipmentChecklistDto){
+		EquipmentChecklist checkList = sessionService.updateCheckList(equipmentChecklistDto);
+		return new ResponseEntity<EquipmentChecklist>(checkList, HttpStatus.OK);
+	}
+	
+	@PostMapping("/addEquipmentMaster")
+	public ResponseEntity<Equipment> addEquipment(@RequestBody Equipment equipment){
+		Equipment equipmentResult = sessionService.addEquipment(equipment);
+		return new ResponseEntity<Equipment>(equipmentResult, HttpStatus.OK);
+	}
+	
+	@GetMapping("/getEquipmentMaster")
+	public ResponseEntity<List<Equipment>> getEquipment(){
+		List<Equipment> equipment = sessionService.getEquipment();
+		return new ResponseEntity<List<Equipment>>(equipment, HttpStatus.OK);
 	}
 }

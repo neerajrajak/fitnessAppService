@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,13 +25,17 @@ import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.AttendedSession;
 import com.fitapp.services.dto.ClientAttendanceInfo;
 import com.fitapp.services.dto.ClientRecordDto;
+import com.fitapp.services.dto.EquipmentChecklistDto;
 import com.fitapp.services.dto.MarkAttendance;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.dto.TainerNotesDto;
+import com.fitapp.services.exception.EquipmentException;
 import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
+import com.fitapp.services.models.Equipment;
+import com.fitapp.services.models.EquipmentChecklist;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
@@ -40,6 +43,8 @@ import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.models.TrainerNotes;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
+import com.fitapp.services.repository.EquipmentChecklistRepository;
+import com.fitapp.services.repository.EquipmentRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
 import com.fitapp.services.repository.SessionDetailsRepositpry;
 import com.fitapp.services.repository.TrainerDetailsRepository;
@@ -58,7 +63,7 @@ public class SessionService {
 	private final SessionDetailsRepositpry sessionDetailsRepositpry;
 
 	private final SessionDestailNumRepository sessionDestailNumRepository;
-	
+
 	private final TrainerDetailsRepository trainerDetailsRepository;
 
 	private ObjectMapper objectMapper;
@@ -66,6 +71,10 @@ public class SessionService {
 	private final ClientRecordNumRepository clientRecordNumRepository;
 
 	private final ClientRecordRepository clientRecordRepository;
+
+	private final EquipmentRepository equipmentRepository;
+
+	private final EquipmentChecklistRepository equipmentChecklistRepository;
 
 	@PostConstruct
 	public void configObjectMapper() {
@@ -119,26 +128,26 @@ public class SessionService {
 		List<SessionDetails> sessionDetails = sessionDetailsRepositpry
 				.findAllByTrainerIdAndStartTimeBetweenOrderByStartTimeDesc(request.getTrainerId(), startDate, endDate);
 		trainerDashboardDetail.setSessionDetail(sessionDetails);
-		int customerTrained=0;
-		int trainingTime=0;
-		int totalTimelyAttendance=0;
+		int customerTrained = 0;
+		int trainingTime = 0;
+		int totalTimelyAttendance = 0;
 		List<SessionDetails> allSessionDetails = sessionDetailsRepositpry.findAllByTrainerId(request.getTrainerId());
-		for(SessionDetails session: allSessionDetails) {
-			trainingTime +=session.getTotalhours();
+		for (SessionDetails session : allSessionDetails) {
+			trainingTime += session.getTotalhours();
 			customerTrained += session.getClientInfo().size();
-			
+
 		}
-		
+
 		trainerDashboardDetail.setTrainingTime(trainingTime);
 		trainerDashboardDetail.setCustomerTrained(customerTrained);
 		trainerDashboardDetail.setTotalTimelyAttendance(totalTimelyAttendance);
 		return trainerDashboardDetail;
 	}
 
-	public ClientRecord getClientDetail(String clientId, String sessionId) {
-		Optional<ClientRecord> clientRecord = clientRecordRepository.findBySessionIdAndClientId(sessionId, clientId);
-		if (clientRecord.isPresent()) {
-			return clientRecord.get();
+	public ClientRecord getClientDetail(String clientId) {
+		ClientRecord clientRecord = clientRecordRepository.findByClientId(clientId);
+		if (clientRecord != null) {
+			return clientRecord;
 		}
 		return null;
 	}
@@ -146,10 +155,10 @@ public class SessionService {
 	public ClientRecord addAndUpdateClientDetails(ClientRecordDto clientRecordDto) {
 		ClientRecord clientRecord = objectMapper.convertValue(clientRecordDto, ClientRecord.class);
 		ClientRecord clientDetail = clientRecordRepository.findByClientId(clientRecordDto.getClientId());
-		if(clientDetail!=null) {
+		if (clientDetail != null) {
 			throw new NumberNotFoundException(FitAppConstants.CLIENT_ALREADY_PRESENT);
 		}
-		if(clientRecord.getClientRecordId() == null) {		
+		if (clientRecord.getClientRecordId() == null) {
 			clientRecord.setClientRecordId(StringUtils.leftPad(String.valueOf(getNextClientRecordId()), 4, "0"));
 		}
 		clientRecord = clientRecordRepository.save(clientRecord);
@@ -261,5 +270,27 @@ public class SessionService {
 		}
 		clientRecord = clientRecordRepository.save(clientRecord);
 		return clientRecord;
+	}
+
+	public EquipmentChecklist updateCheckList(EquipmentChecklistDto equipmentChecklistDto) {
+
+		EquipmentChecklist equipmentChecklist = objectMapper.convertValue(equipmentChecklistDto,
+				EquipmentChecklist.class);
+		EquipmentChecklist checkList = equipmentChecklistRepository
+				.findBySessionId(equipmentChecklistDto.getSessionId());
+		if (checkList != null) {
+			throw new EquipmentException(FitAppConstants.CHECKLIST_ALREADY_UPDATED);
+
+		}
+		equipmentChecklist = equipmentChecklistRepository.save(equipmentChecklist);
+		return equipmentChecklist;
+	}
+
+	public List<Equipment> getEquipment() {
+		return equipmentRepository.findAll();
+	}
+
+	public Equipment addEquipment(Equipment equipment) {
+		return equipmentRepository.save(equipment);
 	}
 }
