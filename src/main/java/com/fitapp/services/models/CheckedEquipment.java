@@ -1,5 +1,7 @@
 package com.fitapp.services.models;
 
+import com.fitapp.services.models.Equipment.AvailableWith;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckedEquipment {
-	private String equipmentType;
+	private AvailableWith availableWith;
 	private double equipmentQuantity;
 	private String equipmentName;
 	private double received;

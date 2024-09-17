@@ -12,10 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Equipment {
+	public enum AvailableWith {
+	    TRAINER,
+	    SEND_FROM_HQ,
+	    CLASS;
+	}
+	
 	@Id
 	private String id;
 	
-	private String equipmentType;
+	private AvailableWith availableWith;
 	private double equipmentQuantity;
 	private String equipmentName;
 	
