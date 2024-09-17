@@ -17,7 +17,7 @@ public class EquipmentChecklist {
 
 	@Id
 	private String id;
-	List<CheckedEquipment> CheckedEquipment;
+	List<CheckedEquipment> checkedEquipment;
 	private String sessionId;
 	private String checkedByUserName;
 	private String checkedByUserId;

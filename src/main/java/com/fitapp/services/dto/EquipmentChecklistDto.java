@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EquipmentChecklistDto {
 	
-	List<CheckedEquipment> CheckedEquipment;
+	List<CheckedEquipment> checkedEquipment;
 	private String sessionId;
 	private String checkedByUserName;
 	private String checkedByUserId;
