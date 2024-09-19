@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,6 +37,7 @@ import com.fitapp.services.exception.NumberNotFoundException;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.Equipment;
+import com.fitapp.services.models.Equipment.AvailableWith;
 import com.fitapp.services.models.EquipmentChecklist;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
@@ -291,8 +293,16 @@ public class SessionService {
 		return equipmentChecklist;
 	}
 
-	public List<Equipment> getEquipment() {
-		return equipmentRepository.findAll();
+	public Map<AvailableWith, List<Equipment>> getEquipment() {
+		List<Equipment> equipmentList = equipmentRepository.findAll();
+		Map<AvailableWith, List<Equipment>> result = new HashMap<>();
+		result.put(AvailableWith.TRAINER,
+				equipmentList.stream().filter(eqp -> AvailableWith.TRAINER.equals(eqp.getAvailableWith())).toList());
+		result.put(AvailableWith.SEND_FROM_HQ, equipmentList.stream()
+				.filter(eqp -> AvailableWith.SEND_FROM_HQ.equals(eqp.getAvailableWith())).toList());
+		result.put(AvailableWith.CLASS,
+				equipmentList.stream().filter(eqp -> AvailableWith.CLASS.equals(eqp.getAvailableWith())).toList());
+		return result;
 	}
 
 	public Equipment addEquipment(Equipment equipment) {

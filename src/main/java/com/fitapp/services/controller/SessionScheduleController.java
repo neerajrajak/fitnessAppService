@@ -1,6 +1,7 @@
 package com.fitapp.services.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.dto.TainerNotesDto;
 import com.fitapp.services.models.ClientRecord;
 import com.fitapp.services.models.Equipment;
+import com.fitapp.services.models.Equipment.AvailableWith;
 import com.fitapp.services.models.EquipmentChecklist;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
@@ -105,8 +107,8 @@ public class SessionScheduleController {
 	}
 	
 	@GetMapping("/getEquipmentMaster")
-	public ResponseEntity<List<Equipment>> getEquipment(){
-		List<Equipment> equipment = sessionService.getEquipment();
-		return new ResponseEntity<List<Equipment>>(equipment, HttpStatus.OK);
+	public ResponseEntity<Map<AvailableWith,List<Equipment>>> getEquipment(){
+		Map<AvailableWith,List<Equipment>> equipment = sessionService.getEquipment();
+		return new ResponseEntity<Map<AvailableWith,List<Equipment>>>(equipment, HttpStatus.OK);
 	}
 }
