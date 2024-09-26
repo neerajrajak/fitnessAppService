@@ -17,4 +17,6 @@ public interface ClientRecordRepository extends MongoRepository<ClientRecord, St
 
 	ClientRecord findByClientId(String clientId);
 
+	List<ClientRecord> findAllByClientIdIn(List<String> clientIds);
+
 }

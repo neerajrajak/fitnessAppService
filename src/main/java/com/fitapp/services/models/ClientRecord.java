@@ -30,6 +30,7 @@ public class ClientRecord {
 	private List<AttendedSession> sessionAttended;
 	private String clientName;
 	private String clientAge;
+	private String clientGender;
 	private String fitnessLevel;
 	private String attendance;
 	private String totalSession;

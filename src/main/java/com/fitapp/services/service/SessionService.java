@@ -26,6 +26,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fitapp.services.constants.FitAppConstants;
 import com.fitapp.services.dto.AttendedSession;
 import com.fitapp.services.dto.ClientAttendanceInfo;
+import com.fitapp.services.dto.ClientInfo;
 import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.EquipmentChecklistDto;
 import com.fitapp.services.dto.MarkAttendance;
@@ -70,7 +71,7 @@ public class SessionService {
 	private final TrainerDetailsRepository trainerDetailsRepository;
 
 	private ObjectMapper objectMapper;
-	
+
 	private ModelMapper modelMapper;
 
 	private final ClientRecordNumRepository clientRecordNumRepository;
@@ -122,6 +123,61 @@ public class SessionService {
 
 	public SessionDetails getSessionDetails(String sessionId) {
 		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(sessionId);
+		if (sessionDetails == null) {
+			throw new NumberNotFoundException(FitAppConstants.SESSION_NOT_FOUND);
+		}
+		List<String> clientIds = sessionDetails.getClientInfo().stream().map(ClientInfo::getClientId).toList();
+		Map<String, ClientInfo> clientInfoMap = sessionDetails.getClientInfo().stream()
+				.collect(Collectors.toMap(ClientInfo::getClientId, Function.identity()));
+		List<ClientRecord> clientRecordList = clientRecordRepository.findAllByClientIdIn(clientIds);
+		Map<String, Double> map = new HashMap<>();
+		double pregnancyCareCount = 0.0;
+		double starterCount = 0.0;
+		double ninjaCount = 0.0;
+		double eliteCount = 0.0;
+		double maleCount = 0.0;
+		double femaleCount = 0.0;
+		double seniorCount = 0.0;
+		double healthIsuueCount = 0.0;
+
+		for (ClientRecord clientRecord : clientRecordList) {
+			if (clientRecord.getIssues() != null && clientRecord.getIssues().get("pregnecyIsuee") != null) {
+				pregnancyCareCount++;
+			}
+			if ("Beginner".equalsIgnoreCase(clientRecord.getFitnessLevel())) {
+				starterCount++;
+			} else if ("Intermediate".equalsIgnoreCase(clientRecord.getFitnessLevel())) {
+				ninjaCount++;
+			} else if ("Advanced".equalsIgnoreCase(clientRecord.getFitnessLevel())) {
+				eliteCount++;
+			}
+
+			if ("Male".equalsIgnoreCase(clientRecord.getClientGender())) {
+				maleCount++;
+			} else if ("Female".equalsIgnoreCase(clientRecord.getClientGender())) {
+				femaleCount++;
+			}
+			if (clientInfoMap.get(clientRecord.getClientId()) != null) {
+				if (StringUtils.isNotBlank(clientInfoMap.get(clientRecord.getClientId()).getMedicalIssue())) {
+					healthIsuueCount++;
+				}
+			}
+			int age = Integer.parseInt(clientRecord.getClientAge());
+			if (age > 50) {
+				seniorCount++;
+			}
+		}
+
+		map.put("All", Double.valueOf(clientIds.size()));
+		map.put("pregnancyCareCount", pregnancyCareCount);
+		map.put("starterCount", starterCount);
+		map.put("ninjaCount", ninjaCount);
+		map.put("eliteCount", eliteCount);
+		map.put("maleCount", maleCount);
+		map.put("femaleCount", femaleCount);
+		map.put("seniorCount", seniorCount);
+		map.put("healthIsuueCount", healthIsuueCount);
+		sessionDetails.setClientCount(map);
 		return sessionDetails;
 	}
 
