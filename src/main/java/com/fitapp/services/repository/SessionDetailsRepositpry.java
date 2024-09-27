@@ -19,5 +19,7 @@ public interface SessionDetailsRepositpry extends MongoRepository<SessionDetails
 			LocalDateTime endDate);
 
 	List<SessionDetails> findAllByTrainerId(String trainerId);
+
+	List<SessionDetails> findAllByTrainerIdOrderByActualEndTimeDesc(String trainerId);
 	
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -178,6 +179,13 @@ public class SessionService {
 		map.put("seniorCount", seniorCount);
 		map.put("healthIsuueCount", healthIsuueCount);
 		sessionDetails.setClientCount(map);
+		List<SessionDetails> trainersAllSession = sessionDetailsRepositpry.findAllByTrainerIdOrderByActualEndTimeDesc(sessionDetails.getTrainerId());
+		trainersAllSession.removeIf(session->!"Close".equals(session.getStatus()) || sessionDetails.getSessionId().equals(session.getSessionId()));
+		if(!ObjectUtils.isEmpty(trainersAllSession)) {
+			sessionDetails.setPreviousWorkout(trainersAllSession.get(0).getTrainingName());
+			sessionDetails.setPreviousWorkoutTime(trainersAllSession.get(0).getActualEndTime());
+			
+		}
 		return sessionDetails;
 	}
 

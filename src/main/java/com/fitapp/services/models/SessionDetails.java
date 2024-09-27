@@ -54,6 +54,6 @@ public class SessionDetails {
 	private String previousWorkout;
 	
 	@Transient
-	private String previousWorkoutTime;
+	private LocalDateTime previousWorkoutTime;
 
 }
