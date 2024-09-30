@@ -28,6 +28,7 @@ public class TrainerDetails {
 	@NotBlank
 	private String mobileNo;
 	private String gender;
+	private double age;
 	@NotNull(message="speciality can't be null")
 	@NotBlank
 	private String speciality;

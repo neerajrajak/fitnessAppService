@@ -14,6 +14,7 @@ public class NewTrainerRequest {
 	private String trainerName;
 	private String mobileNo;
 	private String gender;
+	private double age;
 	private String speciality;
 	private LocalDate trainerSince;
 }
