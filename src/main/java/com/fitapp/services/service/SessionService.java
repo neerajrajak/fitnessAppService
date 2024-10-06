@@ -31,16 +31,20 @@ import com.fitapp.services.dto.ClientInfo;
 import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.EquipmentChecklistDto;
 import com.fitapp.services.dto.MarkAttendance;
+import com.fitapp.services.dto.RatingDto;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.dto.TainerNotesDto;
 import com.fitapp.services.exception.EquipmentException;
 import com.fitapp.services.exception.NumberNotFoundException;
+import com.fitapp.services.exception.SessionException;
 import com.fitapp.services.models.ClientRecord;
+import com.fitapp.services.models.ClientSessionDetails;
 import com.fitapp.services.models.CustomerNum;
 import com.fitapp.services.models.Equipment;
 import com.fitapp.services.models.Equipment.AvailableWith;
 import com.fitapp.services.models.EquipmentChecklist;
+import com.fitapp.services.models.Rating;
 import com.fitapp.services.models.SessionDestailNum;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
@@ -48,8 +52,10 @@ import com.fitapp.services.models.TrainerDetails;
 import com.fitapp.services.models.TrainerNotes;
 import com.fitapp.services.repository.ClientRecordNumRepository;
 import com.fitapp.services.repository.ClientRecordRepository;
+import com.fitapp.services.repository.ClientSessionDetailsRepository;
 import com.fitapp.services.repository.EquipmentChecklistRepository;
 import com.fitapp.services.repository.EquipmentRepository;
+import com.fitapp.services.repository.RatingRepository;
 import com.fitapp.services.repository.SessionDestailNumRepository;
 import com.fitapp.services.repository.SessionDetailsRepositpry;
 import com.fitapp.services.repository.TrainerDetailsRepository;
@@ -71,6 +77,8 @@ public class SessionService {
 
 	private final TrainerDetailsRepository trainerDetailsRepository;
 
+	private final RatingRepository ratingRepository;
+
 	private ObjectMapper objectMapper;
 
 	private ModelMapper modelMapper;
@@ -82,6 +90,8 @@ public class SessionService {
 	private final EquipmentRepository equipmentRepository;
 
 	private final EquipmentChecklistRepository equipmentChecklistRepository;
+	
+	private final ClientSessionDetailsRepository clientSessionDetailsRepository;
 
 	@PostConstruct
 	public void configObjectMapper() {
@@ -179,12 +189,14 @@ public class SessionService {
 		map.put("seniorCount", seniorCount);
 		map.put("healthIsuueCount", healthIsuueCount);
 		sessionDetails.setClientCount(map);
-		List<SessionDetails> trainersAllSession = sessionDetailsRepositpry.findAllByTrainerIdOrderByActualEndTimeDesc(sessionDetails.getTrainerId());
-		trainersAllSession.removeIf(session->!"Close".equals(session.getStatus()) || sessionDetails.getSessionId().equals(session.getSessionId()));
-		if(!ObjectUtils.isEmpty(trainersAllSession)) {
+		List<SessionDetails> trainersAllSession = sessionDetailsRepositpry
+				.findAllByTrainerIdOrderByActualEndTimeDesc(sessionDetails.getTrainerId());
+		trainersAllSession.removeIf(session -> !"Close".equals(session.getStatus())
+				|| sessionDetails.getSessionId().equals(session.getSessionId()));
+		if (!ObjectUtils.isEmpty(trainersAllSession)) {
 			sessionDetails.setPreviousWorkout(trainersAllSession.get(0).getTrainingName());
 			sessionDetails.setPreviousWorkoutTime(trainersAllSession.get(0).getActualEndTime());
-			
+
 		}
 		return sessionDetails;
 	}
@@ -371,5 +383,45 @@ public class SessionService {
 
 	public Equipment addEquipment(Equipment equipment) {
 		return equipmentRepository.save(equipment);
+	}
+
+	public List<Rating> submitRating(List<RatingDto> rating) throws SessionException {
+		if (ObjectUtils.isEmpty(rating)
+				|| rating.stream().map(RatingDto::getSessionId).distinct().toList().size() > 1) {
+			throw new SessionException("Invalid Session Id");
+		}
+		List<Rating> ratingList = ratingRepository.findAllBySessionId(rating.get(0).getSessionId());
+
+		Map<String, Rating> collect = ratingList.stream()
+				.collect(Collectors.toMap(Rating::getEntityId, Function.identity()));
+
+		List<Rating> list = rating.stream().map(element -> modelMapper.map(element, Rating.class))
+				.collect(Collectors.toList());
+		List<Rating> result = new ArrayList<>();
+		for (Rating rate : list) {
+			Rating entityRating = collect.get(rate.getEntityId());
+			if (entityRating == null) {
+				result.add(ratingRepository.save(entityRating));
+			}
+		}
+		return result;
+	}
+
+	public SessionDetails getClientSessionDetails(String sessionId) {
+		SessionDetails sessionDetails = sessionDetailsRepositpry.findBySessionId(sessionId);
+		if (sessionDetails == null) {
+			throw new NumberNotFoundException(FitAppConstants.SESSION_NOT_FOUND);
+		}
+		return sessionDetails;
+	}
+
+	public List<ClientSessionDetails> getClientSessionDetail(SessionDetailRequest request) {
+		Collections.sort(request.getDate());
+		LocalDateTime startDate = LocalDateTime.of(request.getDate().get(0).toLocalDate(), LocalTime.MIDNIGHT);
+		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size() - 1).toLocalDate(),
+				LocalTime.MAX);
+		List<ClientSessionDetails> sessionDetails = clientSessionDetailsRepository
+				.findAllByTrainerIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(request.getClientId(),"Active", startDate, endDate);
+		return sessionDetails;
 	}
 }

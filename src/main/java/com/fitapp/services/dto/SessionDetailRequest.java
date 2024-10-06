@@ -10,5 +10,6 @@ public class SessionDetailRequest {
 	
 	private String trainerId;
 	private List<LocalDateTime> date;
+	private String clientId;
 
 }

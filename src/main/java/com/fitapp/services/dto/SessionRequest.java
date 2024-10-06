@@ -24,6 +24,9 @@ public class SessionRequest {
 	private String location;
 	private double totalhours;
 	private double actualTotalhours;
+	private String sessionLevel;
+	private String sessionSummary;
+	private String calorie;
 	private String trainingName;
 	private List<ClientAttendanceInfo> clientAttendance; 
 	private String toBeTrainedBy;

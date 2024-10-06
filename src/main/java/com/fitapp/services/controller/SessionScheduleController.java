@@ -18,13 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fitapp.services.dto.ClientRecordDto;
 import com.fitapp.services.dto.EquipmentChecklistDto;
 import com.fitapp.services.dto.MarkAttendance;
+import com.fitapp.services.dto.RatingDto;
 import com.fitapp.services.dto.SessionDetailRequest;
 import com.fitapp.services.dto.SessionRequest;
 import com.fitapp.services.dto.TainerNotesDto;
+import com.fitapp.services.exception.SessionException;
 import com.fitapp.services.models.ClientRecord;
+import com.fitapp.services.models.ClientSessionDetails;
 import com.fitapp.services.models.Equipment;
 import com.fitapp.services.models.Equipment.AvailableWith;
 import com.fitapp.services.models.EquipmentChecklist;
+import com.fitapp.services.models.Rating;
 import com.fitapp.services.models.SessionDetails;
 import com.fitapp.services.models.TrainerDashboardDetail;
 import com.fitapp.services.service.SessionService;
@@ -110,5 +114,23 @@ public class SessionScheduleController {
 	public ResponseEntity<Map<AvailableWith,List<Equipment>>> getEquipment(){
 		Map<AvailableWith,List<Equipment>> equipment = sessionService.getEquipment();
 		return new ResponseEntity<Map<AvailableWith,List<Equipment>>>(equipment, HttpStatus.OK);
+	}
+	
+	@PostMapping("/submitRating")
+	public ResponseEntity<List<Rating>> submitRating(@RequestBody List<RatingDto> rating) throws SessionException{
+		List<Rating> result = sessionService.submitRating(rating);
+		return new ResponseEntity<List<Rating>>(result, HttpStatus.OK);
+	}
+	
+	@GetMapping("/client/sessionDetails/{sessionId}")
+	public ResponseEntity<SessionDetails> getClientSessionDetails(@PathVariable  String sessionId) throws Exception {
+		SessionDetails sessionDetails = sessionService.getClientSessionDetails(sessionId);
+		return new ResponseEntity<SessionDetails>(sessionDetails, HttpStatus.OK);
+	}
+	
+	@PostMapping("/getClientSessionDetail")
+	public ResponseEntity<List<ClientSessionDetails>> getClientSessionDetail(@RequestBody  SessionDetailRequest request) throws Exception {
+		List<ClientSessionDetails> clientSessionDetail = sessionService.getClientSessionDetail(request);
+		return new ResponseEntity<List<ClientSessionDetails>>(clientSessionDetail, HttpStatus.OK);
 	}
 }
