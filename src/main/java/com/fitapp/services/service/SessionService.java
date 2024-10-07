@@ -424,4 +424,11 @@ public class SessionService {
 				.findAllByTrainerIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(request.getClientId(),"Active", startDate, endDate);
 		return sessionDetails;
 	}
+
+	public ClientSessionDetails addClientSessionDetail(SessionRequest request) {
+		ClientSessionDetails sessionDetails = objectMapper.convertValue(request, ClientSessionDetails.class);
+		sessionDetails = clientSessionDetailsRepository.save(sessionDetails);
+		log.info("session {} is saved: ", sessionDetails.getSessionId());
+		return sessionDetails;
+	}
 }

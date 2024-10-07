@@ -133,4 +133,10 @@ public class SessionScheduleController {
 		List<ClientSessionDetails> clientSessionDetail = sessionService.getClientSessionDetail(request);
 		return new ResponseEntity<List<ClientSessionDetails>>(clientSessionDetail, HttpStatus.OK);
 	}
+	
+	@PostMapping("/addClientSessionDetail")
+	public ResponseEntity<ClientSessionDetails> addClientSessionDetail(@RequestBody  SessionRequest request) throws Exception {
+		ClientSessionDetails sessionDetail = sessionService.addClientSessionDetail(request);
+		return new ResponseEntity<ClientSessionDetails>(sessionDetail, HttpStatus.OK);
+	}
 }
