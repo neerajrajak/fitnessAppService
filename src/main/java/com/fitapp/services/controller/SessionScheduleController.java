@@ -135,7 +135,7 @@ public class SessionScheduleController {
 	}
 	
 	@PostMapping("/addClientSessionDetail")
-	public ResponseEntity<ClientSessionDetails> addClientSessionDetail(@RequestBody  SessionRequest request) throws Exception {
+	public ResponseEntity<ClientSessionDetails> addClientSessionDetail(@RequestBody  ClientSessionDetails request) throws Exception {
 		ClientSessionDetails sessionDetail = sessionService.addClientSessionDetail(request);
 		return new ResponseEntity<ClientSessionDetails>(sessionDetail, HttpStatus.OK);
 	}
