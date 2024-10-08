@@ -14,7 +14,9 @@ public interface ClientSessionDetailsRepository extends MongoRepository<ClientSe
 	List<ClientSessionDetails> findAllByTrainerIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(String clientId,
 			String status, LocalDateTime endDate);
 
-	List<ClientSessionDetails> findAllByTrainerIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(String clientId,
+	ClientSessionDetails findByClientIdAndSessionId(String clientId, String sessionId);
+
+	List<ClientSessionDetails> findAllByClientIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(String clientId,
 			String string, LocalDateTime startDate, LocalDateTime endDate);
 
 }

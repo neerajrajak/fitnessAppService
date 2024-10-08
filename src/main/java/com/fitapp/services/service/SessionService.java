@@ -421,11 +421,19 @@ public class SessionService {
 		LocalDateTime endDate = LocalDateTime.of(request.getDate().get(request.getDate().size() - 1).toLocalDate(),
 				LocalTime.MAX);
 		List<ClientSessionDetails> sessionDetails = clientSessionDetailsRepository
-				.findAllByTrainerIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(request.getClientId(),"Active", startDate, endDate);
+				.findAllByClientIdAndStatusAndStartTimeBetweenOrderByStartTimeDesc(request.getClientId(),"Active", startDate, endDate);
 		return sessionDetails;
 	}
 
 	public ClientSessionDetails addClientSessionDetail(ClientSessionDetails request) {
-		return clientSessionDetailsRepository.save(request);
+		ClientSessionDetails record = clientSessionDetailsRepository.findByClientIdAndSessionId(request.getClientId(),request.getSessionId());
+		if (record != null) {
+			String id = record.getId();
+			record = modelMapper.map(request, ClientSessionDetails.class,"id");
+			record.setId(id);
+			return clientSessionDetailsRepository.save(record);
+		}else {			
+			return clientSessionDetailsRepository.save(request);
+		}
 	}
 }
