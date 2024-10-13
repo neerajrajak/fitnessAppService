@@ -58,5 +58,8 @@ public class SessionDetails {
 	
 	@Transient
 	private LocalDateTime previousWorkoutTime;
+	
+	@Transient
+	private EquipmentChecklist equipmentChecklist;
 
 }

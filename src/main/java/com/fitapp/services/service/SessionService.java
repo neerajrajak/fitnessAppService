@@ -141,6 +141,7 @@ public class SessionService {
 		Map<String, ClientInfo> clientInfoMap = sessionDetails.getClientInfo().stream()
 				.collect(Collectors.toMap(ClientInfo::getClientId, Function.identity()));
 		List<ClientRecord> clientRecordList = clientRecordRepository.findAllByClientIdIn(clientIds);
+		EquipmentChecklist equipmentChecklist = equipmentChecklistRepository.findBySessionId(sessionId);
 		Map<String, Double> map = new HashMap<>();
 		double pregnancyCareCount = 0.0;
 		double starterCount = 0.0;
@@ -198,6 +199,7 @@ public class SessionService {
 			sessionDetails.setPreviousWorkoutTime(trainersAllSession.get(0).getActualEndTime());
 
 		}
+		sessionDetails.setEquipmentChecklist(equipmentChecklist);
 		return sessionDetails;
 	}
 
