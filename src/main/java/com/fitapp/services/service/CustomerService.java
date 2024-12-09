@@ -3,6 +3,7 @@ package com.fitapp.services.service;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -78,6 +79,7 @@ public class CustomerService {
 		}
 	}
 
+	@Transactional
 	public CustomerRegistration updateCustomerReqlvl2(CustomerRequestlevel2 customerRequest) {
 
 		String housingSocietyId = customerRequest.getHousingSocietyId();
@@ -107,9 +109,8 @@ public class CustomerService {
 		updateDefination.set("totalDlyEnergyExpend", customerRequest.getTotalDlyEnergyExpend());
 		updateDefination.set("housingSocietyId", housingSocietyId);
 
-		CustomerRegistration customer = mongoTemplate.findAndModify(query, updateDefination,
-				CustomerRegistration.class);
-		return customer;
+        return mongoTemplate.findAndModify(query, updateDefination,
+                CustomerRegistration.class);
 
 	}
 
